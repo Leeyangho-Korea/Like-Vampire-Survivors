@@ -20,11 +20,12 @@ TextureImporter:
     externalNormalMap: 0
     heightScale: 0.25
     normalMapFilter: 0
+    flipGreenChannel: 0
   isReadable: 0
   streamingMipmaps: 0
   streamingMipmapsPriority: 0
   vTOnly: 0
-  ignoreMasterTextureLimit: 0
+  ignoreMipmapLimit: 0
   grayScaleToAlpha: 0
   generateCubemap: 6
   cubemapConvolution: 0
@@ -63,6 +64,7 @@ TextureImporter:
   textureFormatSet: 0
   ignorePngGamma: 0
   applyGammaDecoding: 0
+  swizzle: 50462976
   cookieLightType: 0
   platformSettings:
   - serializedVersion: 3
@@ -255,7 +257,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Idle 0
+      name: Stand 0
       rect:
         serializedVersion: 2
         x: 0
@@ -276,7 +278,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Idle 1
+      name: Stand 1
       rect:
         serializedVersion: 2
         x: 19
@@ -297,7 +299,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Idle 2
+      name: Stand 2
       rect:
         serializedVersion: 2
         x: 38
@@ -318,7 +320,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Idle 3
+      name: Stand 3
       rect:
         serializedVersion: 2
         x: 0
@@ -391,21 +393,20 @@ TextureImporter:
     weights: []
     secondaryTextures: []
     nameFileIdTable:
+      Stand 1: -1592204662
       Run 0: 1363809998
       Run 5: -1732568499
-      Idle 0: -150523396
+      Stand 3: 381631601
       Run 2: 847793873
       Run 3: 937111007
-      Idle 3: 381631601
+      Stand 0: -150523396
+      Stand 2: 1438553564
       Run 4: 1842362625
       Run 1: -188091907
-      Idle 2: 1438553564
       Dead 1: 1929632063
-      Idle 1: -1592204662
       Dead 0: 1375599644
-  spritePackingTag: 
+  mipmapLimitGroupName: 
   pSDRemoveMatte: 0
-  pSDShowRemoveMatteOption: 0
   userData: 
   assetBundleName: 
   assetBundleVariant: 
