@@ -2,37 +2,43 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// 무기의 개수, 속도, 데미지 등을 관리
+/// </summary>
+
 
 public class Weapon : MonoBehaviour
 {
     public int id;
     public int prefabId;
-    public float damage;
-    public int count;
-    public float speed;
+    public float damage; // 무기 데미지
+    public int count; // 무기 개수
+    public float speed; // 무기 속도
 
     float timer;
     Player player;
 
-    void Awake()
+    private void Awake()
     {
-        player = GameManager.instance.player;
+        player = GetComponentInParent<Player>();
+    }
+
+    private void Start()
+    {
+        Init();
     }
 
     void Update()
     {
-        if (!GameManager.instance.isLive)
-            return;
-
         switch (id)
         {
             case 0:
-                transform.Rotate(Vector3.back * speed * Time.deltaTime);
+                transform.Rotate(Vector3.back * speed  *  Time.deltaTime);
                 break;
             default:
                 timer += Time.deltaTime;
 
-                if (timer > speed)
+                if(timer > speed)
                 {
                     timer = 0f;
                     Fire();
@@ -40,8 +46,8 @@ public class Weapon : MonoBehaviour
                 break;
         }
 
-        // .. Test Code..
-        if (Input.GetButtonDown("Jump"))
+        // ..TestCode..
+        if(Input.GetButtonDown("Jump"))
         {
             LevelUp(10, 1);
         }
@@ -49,64 +55,36 @@ public class Weapon : MonoBehaviour
 
     public void LevelUp(float damage, int count)
     {
-        this.damage = damage * Character.Damage;
+        this.damage = damage;
         this.count += count;
 
         if (id == 0)
-            Batch();
-
-        player.BroadcastMessage("ApplyGear", SendMessageOptions.DontRequireReceiver);
+            Set();
     }
 
-    public void Init(ItemData data)
+    public void Init()
     {
-        // Basic Set
-        name = "Weapon " + data.itemId;
-        transform.parent = player.transform;
-        transform.localPosition = Vector3.zero;
-
-        // Property Set
-        id = data.itemId;
-        damage = data.baseDamage * Character.Damage;
-        count = data.baseCount + Character.Count;
-
-        for (int index = 0; index < GameManager.instance.pool.prefabs.Length; index++)
-        {
-            if (data.projectile == GameManager.instance.pool.prefabs[index])
-            {
-                prefabId = index;
-                break;
-            }
-        }
-
         switch (id)
         {
             case 0:
-                speed = 150 * Character.WeaponSpeed;
-                Batch();
-                break;
+                speed = 150; 
+                Set();
+                    break;
             default:
-                speed = 0.5f * Character.WeaponRate;
+                speed = 0.3f; // 값이 적을수록 빠른 주기로 발사
                 break;
         }
-
-        // Hand Set
-        Hand hand = player.hands[(int)data.itemType];
-        hand.spriter.sprite = data.hand;
-        hand.gameObject.SetActive(true);
-
-        player.BroadcastMessage("ApplyGear", SendMessageOptions.DontRequireReceiver);
     }
 
-    void Batch()
+    void Set()
     {
-        for (int index = 0; index < count; index++)
+        for(int i = 0; i < count; i ++)
         {
-            Transform bullet;
+           Transform bullet;
 
-            if (index < transform.childCount)
+            if(i < transform.childCount)
             {
-                bullet = transform.GetChild(index);
+                bullet = transform.GetChild(i);
             }
             else
             {
@@ -114,13 +92,14 @@ public class Weapon : MonoBehaviour
                 bullet.parent = transform;
             }
 
+
             bullet.localPosition = Vector3.zero;
             bullet.localRotation = Quaternion.identity;
 
-            Vector3 rotVec = Vector3.forward * 360 * index / count;
+            Vector3 rotVec = Vector3.forward * 360 * i / count ;
             bullet.Rotate(rotVec);
             bullet.Translate(bullet.up * 1.5f, Space.World);
-            bullet.GetComponent<Bullet>().Init(damage, -100, Vector3.zero); // -100 is Infinity Per.
+            bullet.GetComponent<Bullet>().Init(damage, -1, Vector2.zero); // -1 은 적을 관통
         }
     }
 
@@ -137,7 +116,5 @@ public class Weapon : MonoBehaviour
         bullet.position = transform.position;
         bullet.rotation = Quaternion.FromToRotation(Vector3.up, dir);
         bullet.GetComponent<Bullet>().Init(damage, count, dir);
-
-        AudioManager.instance.PlaySfx(AudioManager.Sfx.Range);
     }
 }

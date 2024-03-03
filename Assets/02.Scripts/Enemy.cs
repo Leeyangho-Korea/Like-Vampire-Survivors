@@ -1,157 +1,120 @@
-using System.Collections;
+ï»¿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
-/// ¸ó½ºÅÍÀÇ ·ÎÁ÷À» °ü¸®ÇÏ´Â ½ºÅ©¸³Æ®
+/// ëª¬ìŠ¤í„° ìŠ¤í¬ë¦½íŠ¸
+/// íƒ€ê²Ÿì„ ì°¾ì•„ ì´ë™.
+/// ì²´ë ¥ ê´€ë¦¬ ìŠ¤í¬ë¦½íŠ¸
 /// </summary>
+
 public class Enemy : MonoBehaviour
 {
-    // ¼Óµµ
     public float speed;
-    // Ã¼·Â
     public float health;
-    // ÃÖ´ë Ã¼·Â
     public float maxHealth;
-
     public RuntimeAnimatorController[] animCon;
     public Rigidbody2D target;
-
-    // »ì¾ÆÀÖ´ÂÁö ¿©ºÎ ÆÇ´Ü
-    bool isLive;
-
-    Rigidbody2D rigid;
     Collider2D coll;
     Animator anim;
-    SpriteRenderer spriter;
+    bool isLive;
+    Rigidbody2D rigid;
+    SpriteRenderer spriteRenderer;
+
     WaitForFixedUpdate wait;
 
-    void Awake()
+    private void Awake()
     {
+        anim = GetComponent<Animator>();
         rigid = GetComponent<Rigidbody2D>();
         coll = GetComponent<Collider2D>();
-        anim = GetComponent<Animator>();
-        spriter = GetComponent<SpriteRenderer>();
+        spriteRenderer = GetComponent<SpriteRenderer>();
         wait = new WaitForFixedUpdate();
     }
 
-    void FixedUpdate()
+    private void FixedUpdate()
     {
-        // ÇöÀç °ÔÀÓÀÌ ½ÇÇàÁßÀÌ ¾Æ´Ï¶ó¸é Update ½ÇÇà X (ÀÌ ÄÚµåÀÇ ¾Æ·¡ ³»¿ëµé ½ÇÇà X)
-        if (!GameManager.instance.isLive)
-            return;
-
-        // ¸¸¾à ÀÌ ½ºÅ©¸³Æ®¸¦ °¡Áø ¸ó½ºÅÍ°¡ »ì¾ÆÀÖÁö ¾Ê°Å³ª(Á×À½)
-        // ÇöÀç Hit ¿¡´Ï¸ŞÀÌ¼ÇÀÌ ½ÇÇàÁßÀÌ¶ó¸é ¾Æ·¡ ÄÚµåµé ½ÇÇà X
         if (!isLive || anim.GetCurrentAnimatorStateInfo(0).IsName("Hit"))
             return;
 
-        // ÇöÀç ÇÃ·¹ÀÌ¾î(target)ÀÇ À§Ä¡¿¡¼­ ¸ó½ºÅÍÀÇ ÇöÀç À§Ä¡¸¦ »©¼­ ¹æÇâ º¤ÅÍ ¼³Á¤.
-        Vector2 dirVec = target.position - rigid.position;
-        // Á¤±ÔÈ­µÈ ¹æÇâº¤ÅÍ¿¡ ¼Óµµ¸¦ ´Ã·ÁÁÖ¾î °è¼Ó Å¸°ÙÀ» ÇâÇØ ³ª¾Æ°¥ ¼ö ÀÖµµ·Ï ÇÏ´Â º¤ÅÍ.
-        Vector2 nextVec = dirVec.normalized * speed * Time.fixedDeltaTime;
-        // Áö¼ÓÀûÀ¸·Î Å¸°ÙÀ» ÇâÇØ ³ª¾Æ°¥ ¼ö ÀÖµµ·Ï ¸®Áöµå ¹ÙµğÀÇ MovePosition ½ÇÇà.
-        rigid.MovePosition(rigid.position + nextVec);
+        // íƒ€ê²Ÿì˜ ë°©í–¥
+        Vector2 dir = target.position - rigid.position;
 
-        // Áß·ÂÀÇ ¿µÇâÀ» ¹ŞÁö ¾Êµµ·Ï (0,0)°íÁ¤.
+        Vector2 nextVec = dir.normalized * speed * Time.fixedDeltaTime;
+        rigid.MovePosition(rigid.position + nextVec);
         rigid.velocity = Vector2.zero;
     }
 
-    void LateUpdate()
+    private void LateUpdate()
     {
-        // ¸¸¾à °ÔÀÓÀÌ ³¡³µ´Ù¸é ½ÇÇà X
-        if (!GameManager.instance.isLive)
-            return;
-
-        // ¸¸¾à ÇöÀç ÀÌ ½ºÅ©¸³Æ®ÀÇ ¿ÀºêÁ§Æ®°¡ Á×¾ú´Ù¸é ½ÇÇà x
-        if (!isLive)
-            return;
-
-        // ÀÌ ¿ÀºêÁ§Æ®ÀÇ À§Ä¡º¸´Ù Å¸°ÙÀÇ À§Ä¡°¡ ÀÛ´Ù¸é ( Å¸°ÙÀÌ ÀÌ ¿ÀºêÁ§Æ®º¸´Ù ¿ŞÂÊ¿¡ Á¸ÀçÇÏ¸é)
-        // ½ºÇÁ¶óÀÌÆ®·»´õ·¯ÀÇ flipX = true
-        // ¾Æ´Ï¶ó¸é flipX = false
-        spriter.flipX = target.position.x < rigid.position.x;
+        spriteRenderer.flipX = target.position.x < rigid.position.x;
     }
 
-    // ÀÌ ½ºÅ©¸³Æ®ÀÇ ¿ÀºêÁ§Æ®°¡ È°¼ºÈ­ µÉ ¶§ ( ÃÊ±âÈ­ )
-    void OnEnable()
+    // í™œì„±í™” ëì„ ë•Œ
+    private void OnEnable()
     {
-        // Å¸°Ù ¼³Á¤ ( ÇÃ·¹ÀÌ¾î·Î )
         target = GameManager.instance.player.GetComponent<Rigidbody2D>();
+        isLive = true;
+
+
         isLive = true;
         coll.enabled = true;
         rigid.simulated = true;
-        spriter.sortingOrder = 2;
-        // Á×À» ¶§ ¾Ö´Ï¸ŞÀÌ¼ÇÀÌ Dead ¿´´ø °ÍÀ» false·Î ÃÊ±âÈ­.
+        spriteRenderer.sortingOrder = 2;
         anim.SetBool("Dead", false);
+
         health = maxHealth;
     }
 
-    // ¸ó½ºÅÍ ÃÊ±âÈ­
     public void Init(SpawnData data)
     {
-        // ÇöÀç ½ºÅ©¸³Æ®ÀÇ ¸ó½ºÅÍ¿¡ ¸Â´Â ¾Ö´Ï¸ŞÀÌÅÍÄÁÆ®·Ñ·¯ ¼³Á¤
         anim.runtimeAnimatorController = animCon[data.spriteType];
-        // ÇöÀç ½ºÅ©¸³Æ®ÀÇ ¸ó½ºÅÍ¿¡ ¸Â´Â ¼Óµµ, Ã¼·Â ÃÊ±âÈ­.
         speed = data.speed;
         maxHealth = data.health;
         health = data.health;
     }
 
-    void OnTriggerEnter2D(Collider2D collision)
+    private void OnTriggerEnter2D(Collider2D collision)
     {
-        // ÃÑ¾Ë¿¡ ¸ÂÀº°ÍÀÌ ¾Æ´Ï°Å³ª ÀÌ ¿ÀºêÁ§Æ®ÀÇ Ä³¸¯ÀÌ Á×¾úÀ» ¶§
-        // ¾Æ·¡ ÄÚµå ½ÇÇà X
         if (!collision.CompareTag("Bullet") || !isLive)
             return;
 
-        // »ì¾ÆÀÖ°í, ÃÑ¾Ë¿¡ ¸Â¾Ò´Ù¸é ¸ÂÀº ÃÑ¾ËÀÇ µ¥¹ÌÁö¸¸Å­ Ã¼·Â °¨¼Ò
+        // Bulletì˜ ë°ë¯¸ì§€ë§Œí¼ ì²´ë ¥ ê¹ì„.
         health -= collision.GetComponent<Bullet>().damage;
-
-        // KnockBack ÄÚ·çÆ¾ ½ÇÇà
         StartCoroutine(KnockBack());
-
-        // ¸¸¾à Ã¼·ÂÀÌ ³²¾Ò´Ù¸é
-        if (health > 0)
+        if (health >0)
         {
-            // ¸Â´Â ¾Ö´Ï¸ŞÀÌ¼Ç, È¿°úÀ½ ½ÇÇà
-            anim.SetTrigger("Hit");
-            AudioManager.instance.PlaySfx(AudioManager.Sfx.Hit);
+            // ì‚´ì´ìˆìœ¼ë©° ë°ë¯¸ì§€ ì…ì€ ê²ƒì— ëŒ€í•œ ì²˜ë¦¬
+            if (health > 0)
+            {
+                anim.SetTrigger("Hit");
+            }
         }
-        else // Ã¼·ÂÀÌ ³²Áö ¾Ê¾Ò´Ù¸é
+        else
         {
-            // Á×¾úÀ» ¶§ÀÇ °ª ¼³Á¤.
             isLive = false;
             coll.enabled = false;
             rigid.simulated = false;
-            spriter.sortingOrder = 1;
+            spriteRenderer.sortingOrder = 1;
             anim.SetBool("Dead", true);
-            // ÇÃ·¹ÀÌ¾îÀÇ Kill ¼ö Áõ°¡
             GameManager.instance.kill++;
-            // ÇÃ·¹ÀÌ¾îÀÇ Exp Áõ°¡
             GameManager.instance.GetExp();
-
-            // ¾ÆÁ÷ °ÔÀÓÀÌ ½ÇÇàÁßÀÌ¶ó¸é
-            if (GameManager.instance.isLive)
-                // Á×´Â È¿°úÀ½ ½ÇÇà.
-                AudioManager.instance.PlaySfx(AudioManager.Sfx.Dead);
         }
     }
-
+    
+    //ëª¬ìŠ¤í„°ê°€ ë’¤ë¡œ ë°€ë¦¬ëŠ” ì²˜ë¦¬.
     IEnumerator KnockBack()
     {
-        yield return wait; // ´ÙÀ½ ÇÏ³ªÀÇ ¹°¸® ÇÁ·¹ÀÓ µô·¹ÀÌ
-        // ÇÃ·¹ÀÌ¾îÀÇ À§Ä¡
+        yield return wait; // ë¬¼ë¦¬í”„ë ˆì„ 1 í”„ë ˆì„ ì‰¬ê¸°.
         Vector3 playerPos = GameManager.instance.player.transform.position;
-        // ÇÃ·¹ÀÌ¾îÀÇ À§Ä¡¿¡¼­ ¹İ´ëµÇ´Â ¹æÇâ º¤ÅÍ
         Vector3 dirVec = transform.position - playerPos;
-        // ÇÃ·¹ÀÌ¾îÀÇ ¹İ´ë À§Ä¡·Î 3¸¸Å­ÀÇ ÈûÀ» ÀÏ½ÃÀûÀ¸·Î ÁÖ¾î ³Ë¹é ¿¬Ãâ.
         rigid.AddForce(dirVec.normalized * 3, ForceMode2D.Impulse);
+
+
     }
 
-    // Á×´Â ¾Ö´Ï¸ŞÀÌ¼Ç¿¡¼­ ½ÇÇà.
     void Dead()
     {
-        gameObject.SetActive(false);
+        gameObject.SetActive(false); // ì£½ìœ¼ë©´ ë¹„í™œì„±í™” _ í™œì„±í™”ë ë•Œ ëª¨ë“  ê°’ ì´ˆê¸°í™” ë¨.
     }
 }

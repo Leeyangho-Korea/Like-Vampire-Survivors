@@ -1,93 +1,65 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
 /// <summary>
-/// ĳ������ �̵�, ������ �Ÿ� ���
+/// 플레이어의 이동과 애니메이션 스크립트
 /// </summary>
 
 public class Player : MonoBehaviour
 {
-    public Vector2 inputVec;
-    public float speed;
+    public Vector2 inputVec = Vector2.zero; // 입력받는 좌표를 담을 변수 초기화.
     public Scanner scanner;
-    public Hand[] hands;
-    public RuntimeAnimatorController[] animCon;
-
     Rigidbody2D rigid;
-    SpriteRenderer spriter;
+    SpriteRenderer spriteRenderer;
     Animator anim;
 
-    void Awake()
+    public float speed = 0; // 캐릭터 이동 속도
+
+    private void Awake()
     {
+        // 변수 초기화
         rigid = GetComponent<Rigidbody2D>();
-        spriter = GetComponent<SpriteRenderer>();
+        spriteRenderer = GetComponent<SpriteRenderer>();
         anim = GetComponent<Animator>();
         scanner = GetComponent<Scanner>();
-        hands = GetComponentsInChildren<Hand>(true);
     }
 
-    void OnEnable()
+    void Start()
     {
-        speed *= Character.Speed;
-        anim.runtimeAnimatorController = animCon[GameManager.instance.playerId];
+        
     }
 
-    void Update()
-    {
-        if (!GameManager.instance.isLive)
-            return;
 
-        inputVec.x = Input.GetAxisRaw("Horizontal");
-        inputVec.y = Input.GetAxisRaw("Vertical");
+     void FixedUpdate()
+    {
+        // 받은 값에 의한 벡터 정규화. Time.fixedDeltaTime = 물리 프레임 1개 소비된 시간
+        Vector2 tempVec = inputVec.normalized * speed * Time.fixedDeltaTime;
+
+        // 플레이어 이동.
+        rigid.MovePosition(rigid.position + tempVec);
     }
 
-    void FixedUpdate()
+    private void LateUpdate()
     {
-        if (!GameManager.instance.isLive)
-            return;
+        // 정지 상태가 아닐 때
+        if(inputVec.x != 0)  {
+            // 스프라이트렌더러의 flip기능을 사용해서 좌우 반전
+            spriteRenderer.flipX = inputVec.x < 0;
+        }
 
-        Vector2 nextVec = inputVec.normalized * speed * Time.fixedDeltaTime;
-        rigid.MovePosition(rigid.position + nextVec);
-    }
-
-    void LateUpdate()
-    {
-        if (!GameManager.instance.isLive)
-            return;
-
+        // 입력 값에 의해 애니메이션 컨트롤.
         anim.SetFloat("Speed", inputVec.magnitude);
 
 
-        if (inputVec.x != 0)
-        {
-            spriter.flipX = inputVec.x < 0;
-        }
+      //  anim.SetTrigger("Dead");
     }
 
-    void OnCollisionStay2D(Collision2D collision)
+    // InputSystem을 사용한 이동
+    void OnMove(InputValue _value)
     {
-        if (!GameManager.instance.isLive)
-            return;
-
-        GameManager.instance.health -= Time.deltaTime * 10;
-
-        if (GameManager.instance.health < 0)
-        {
-            for (int index = 2; index < transform.childCount; index++)
-            {
-                transform.GetChild(index).gameObject.SetActive(false);
-            }
-
-            anim.SetTrigger("Dead");
-            GameManager.instance.GameOver();
-        }
-    }
-
-    void OnMove(InputValue value)
-    {
-        inputVec = value.Get<Vector2>();
+        // 인풋시스템의 값을 Vector2 형태로 불러오기.
+        inputVec = _value.Get<Vector2>();
     }
 }
-
