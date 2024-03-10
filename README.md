@@ -1,6 +1,6 @@
-# Poltpolio_Project_1
+# Like Vampire Survivors
 # **프로젝트 설명**
-뱀서라이크 게임
+Games Like Vampire Survivors
 
 # **환경**
 - Unity 2021.3.13f1
