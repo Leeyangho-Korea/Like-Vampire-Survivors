@@ -1,6 +1,6 @@
 # Like Vampire Survivors
 # **Description**
-Games Like Vampire Survivors
+Game Like Vampire Survivors
 
 # **Development environment**
 - Unity 2021.3.13f1
